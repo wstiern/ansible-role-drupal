@@ -1,0 +1,166 @@
+# adapting from geerlingguy.drush:tasks/main.yml
+
+- name: Clone Drush from GitHub.
+  git:
+    repo: https://github.com/drush-ops/drush.git
+    dest: "{{ drush_install_path }}"
+    #version: "master"
+    # was getting an error with 9.x branch
+    # https://github.com/geerlingguy/drupal-vm/issues/1020
+    version: "8.x"
+    update: no
+    force: no
+    depth: 1
+  register: drush_clone
+
+- name: Check for composer.json
+  stat: path={{ drush_install_path }}/composer.json
+  register: drush_composer
+
+- name: Install Drush dependencies with Composer.
+  shell: >
+    /usr/local/bin/composer install {{ drush_composer_cli_options }}
+    chdir={{ drush_install_path }}
+  when: drush_clone.changed and drush_composer.stat.exists
+
+- name: Create drush symlink.
+  file:
+    src: "{{ drush_install_path }}/drush"
+    dest: "{{ drush_path }}"
+    state: link
+
+- name: Run drush to finish setting it up.
+  command: "{{ drush_path }}"
+  register: drush_result
+  changed_when: "'Execute a drush command' not in drush_result.stdout"
+  become: no
+
+
+# https://www.lullabot.com/articles/goodbye-drush-make-hello-composer
+
+# - name: check if composer has already downloaded drupal
+#   stat: path={{ drupal_path }}
+#   register: download
+
+# # cd /srv/sites
+# # composer create-project drupal-composer/drupal-project:~8.0 drupal --stability dev --no-interaction
+# # composer create-project drupal-composer/drupal-project:~8.0 drupal --stability dev --no-interaction
+
+# - name: use composer to download drupal core and dependencies
+#   composer:
+#     command: create-project
+#     arguments: drupal-composer/drupal-project:~8.0 drupal --stability dev --no-interaction
+#     working_dir: "{{ drupal_install_dir }}"
+#     #prefer_dist: yes  
+#   when: not download.stat.exists
+
+# this fails for me... have tried many different combinations
+# see below about special characters in the drupal_db_password
+# I had tried urlencoding those values, but I still had difficulty
+# once I removed those specific characters from the password, drush command worked
+# cd drupal/web
+# ../vendor/bin/drush site-install --db-url=mysql://{{ drupal_db_username }}:{{ drupal_db_password }}@localhost/{{ drupal_db_name }}
+
+
+#adapting following from:
+#https://github.com/geerlingguy/ansible-role-drupal/blob/master/tasks/drupal.yml
+
+# Download Drupal using Git.
+- name: Check out Drupal Core to the default location.
+  git:
+    repo: "http://git.drupal.org/project/drupal.git"
+    version: "7.x"
+    # version: "8.1.x"
+    # version: "8.2.x"
+    # version: "8.3.x"
+    # version: "9.x"
+    update: no
+    dest: "{{ drupal_path }}"
+
+# if getting error "Failed to create database: ERROR 1045 (28000): Access denied for user 'drupal'@'localhost' (using password: YES) "
+# I resolved this by changing the password for drupal database
+- name: Install Drupal.
+  command: >
+    drush si standard -y
+    --site-name="{{ drupal_site_name }}"
+    --account-name={{ drupal_admin_name }}
+    --account-pass={{ drupal_admin_password}}
+    --db-url=mysql://{{ drupal_db_username }}:{{ drupal_db_password }}@localhost/{{ drupal_db_name }}
+    chdir={{ drupal_path }}
+    creates={{ drupal_path }}/sites/default/settings.php
+
+# SEE: https://drupal.org/node/2121849#comment-8413637
+- name: Set permissions properly on settings.php.
+  file:
+    path: "{{ drupal_path }}/sites/default/settings.php"
+    mode: 0744
+
+- name: Set permissions properly on files directory.
+  file:
+    path: "{{ drupal_path }}/sites/default/files"
+    mode: 0777
+    state: directory
+    recurse: yes
+
+- name: check if drupal apache config already exists
+  stat: path={{ drupal_apache_config }}
+  register: original
+
+# check if backup of drupal_apache_config exists
+# if it already exists, we won't move it again
+- name: check if drupal apached config backup already exists
+  stat: path=/etc/apache2/sites-available/{{ drupal_name }}.bak
+  register: backup
+
+#note that "copy" command in ansible copies from ansible client to host
+#one machine to the other
+#here we just want to do the copy only on the host
+- name: Make a backup copy of drupal apache config file
+  shell: cp /etc/apache2/sites-available/{{ drupal_apache_config }} /etc/apache2/sites-available/{{ drupal_name }}.bak
+  when: original.stat.exists and not backup.stat.exists
+
+- name: Create an apache config file for drupal site based on template
+  template: src={{ drupal_apache_config }} dest=/etc/apache2/sites-available/{{ drupal_apache_config }}
+  notify:
+    - apache_restart
+  tags: drupal
+
+- name: a2ensite drupal
+  command: a2ensite drupal
+  notify:
+    - apache_restart
+
+# next up is to add the COB theme
+
+# 
+
+- name: Clone COB drupal themes and modules from GitHub.
+  git:
+    repo: https://github.com/City-of-Bloomington/drupal-customizations.git
+    dest: "{{ cob_theme_path }}"
+    version: "master"
+    update: no
+    force: no
+    depth: 1
+  register: cob_theme
+
+
+# ~$ drush version
+# Drush version : 9.0-dev-dev 
+
+
+# TODO:
+# cd /srv/sites/drupal/modules
+# sudo ln -s /srv/sites/drupal-customizations/modules/cob cob
+
+
+# cd /srv/sites/drupal/themes
+# sudo ln -s /srv/sites/drupal-customizations/themes/cob cob
+
+# drush pm-enable cob
+# The following extensions will be enabled: cob
+# Do you really want to continue? (y/n): y
+# cob was enabled successfully.
+
+# Then needed to set as default via gui (way to do this via drush?)
+

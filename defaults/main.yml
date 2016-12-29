@@ -1,0 +1,32 @@
+---
+drupal_name: drupal
+#drupal_uri: /{{ drupal_name }}
+drupal_uri: /
+drupal_install_dir: "/srv/sites"
+drupal_path: "{{ drupal_install_dir }}/{{ drupal_name }}"
+
+cob_theme_path: "{{ drupal_install_dir }}/drupal-customizations"
+
+drupal_apache_config: "{{ drupal_name }}.conf"
+
+drupal_site_name: "City of Bloomington"
+
+# Your Drupal site admin account credentials.
+drupal_admin_name: admin
+drupal_admin_password: changeme
+
+drush_install_path: /usr/local/share/drush
+drush_path: /usr/local/bin/drush
+drush_composer_cli_options: "--prefer-dist --no-interaction"
+
+# drupal_db:
+#   name: "{{ drupal_name }}"
+#   username: "{{ drupal_name }}"
+#   password: "{{ vault_drupal_db.password }}"
+
+# drupal_admin:
+#   username: "{{ ansible_user|default(lookup('env', 'USER'), True) }}"
+#   firstname: "Admin"
+#   lastname: "Person"
+#   email: "{{ ansible_user|default(lookup('env', 'USER'), True) }}@localhost"
+
