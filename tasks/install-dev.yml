@@ -2,8 +2,8 @@
 - Clone the repository
   become: no
   git:
-    repo: "{{ git_site_repo }}"
-    dest: "{{ site_path }} "
+    repo: "{{ drupal_git_site_repo }}"
+    dest: "{{ drupal_site_path }} "
     update: yes
   notify: site update permissions
 
@@ -11,4 +11,4 @@
   become: no
   composer:
     command: update
-    working_dir: "{{ site_path }}"
+    working_dir: "{{ drupal_site_path }}"

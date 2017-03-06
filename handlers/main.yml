@@ -1,2 +1,5 @@
 ---
-# handlers file for cob.drupal
+- name: drupal_site update permissions
+  file: path='{{ site_path }}' state=directory owner=www-data group=staff recurse=yes mode=g+rw
+
+  
