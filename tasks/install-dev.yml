@@ -1,0 +1,14 @@
+--- 
+- Clone the repository
+  become: no
+  git:
+    repo: "{{ git_site_repo }}"
+    dest: "{{ site_path }} "
+    update: yes
+  notify: site update permissions
+
+- Install Core Dependencies
+  become: no
+  composer:
+    command: update
+    working_dir: "{{ site_path }}"

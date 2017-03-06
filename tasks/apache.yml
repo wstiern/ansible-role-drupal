@@ -1,0 +1,21 @@
+---
+- name: check if site apache config already exists
+  stat: path=/etc/apache2/sites-available/{{ drupal_site_name }}.conf
+  register: original
+  
+- name: check if site apache config backup already exists
+  state: path=/etc/apache2/sites-available/{{ drupal_site_name }}.bak
+  register: backup
+  
+- name: Make a backup copy of the site apache config file
+  shell: cp /etc/apache2/sites-available/{{ drupal_site_name }}.conf /etc/apache2/sites-available/{{ drupal_site_name }}.bak
+  when: original.stat.exists and not backup.stat.exists
+  
+- name: Create an apache config file for site based on template
+  template: src=site.conf dest=/etc/apache2/sites-available/{{ drupal_site_name }}.conf
+  notify: apache_restart
+  
+- name: a2ensite site
+  command: a2ensite {{ drupal_site_name }}
+  notify: apache_restart
+  

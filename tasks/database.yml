@@ -1,0 +1,13 @@
+---
+- name: Create mysql database
+  mysql_db:
+    config_file: {{ mysql_conf }}
+    name: {{ drupal_site_name }}
+    encoding: {{ mysql_char_set }}
+    collation: {{ mysql_collate }}
+    state: present
+
+- name: Create 'drupal' mysql user
+  mysql_user:
+    name: {{ mysql_drupal_user }}
+    password: {{ mysql_drupal_pass }} 
