@@ -4,7 +4,7 @@
   register: original
   
 - name: check if site apache config backup already exists
-  state: path=/etc/apache2/sites-available/{{ drupal_site_name }}.bak
+  stat: path=/etc/apache2/sites-available/{{ drupal_site_name }}.bak
   register: backup
   
 - name: Make a backup copy of the site apache config file

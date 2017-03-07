@@ -6,8 +6,8 @@ drupal_site_name: drupal
 drupal_site_path: "{{ drupal_site_install_dir }}/{{ drupal_site_name }}"
 
 drupal_site_db:
-  name: {{ drupal_site_name }}
-  pass: {{ vault_drupal_site_db.pass }}
+  name: "{{ drupal_site_name }}"
+  pass: "{{ vault_drupal_site_db.pass }}"
   conf: /etc/mysql/debian.cnf
   charset: utf8
   collate: utf8_general_ci
