@@ -1,16 +1,15 @@
 Drupal
 ====================
 
-Installs and configures an instance of Drupal.
+Role for maintaining an installation of Drupal.
 
 Role Variables
 --------------
     
-See vars/main.yml for any available variables.
+See defaults for any available variables.
 
 Dependencies
 -------------
-This role assumes the following roles have been applied to the system already:
 
   - City-of-Bloomington.linux
   - City-of-Bloomington.apache
@@ -20,13 +19,10 @@ This role assumes the following roles have been applied to the system already:
 Example Playbook
 ----------------
 ```yml
-- hosts: linux-php
+- hosts: drupal
   become: yes
   roles:
-    - City-of-Bloomington.linux
-    - City-of-Bloomington.apache
-    - City-of-Bloomington.mysql
-    - City-of-Bloomington.php
+    - City-of-Bloomington.drupal
 ```
 
 Additional Information
@@ -38,10 +34,6 @@ https://github.com/city-of-bloomington
 For a general guide on how to use Ansible, see:
 
 https://github.com/city-of-bloomington/system-playbooks
-
-Parts of this role were inspired by:
-
-[Jeff Geerling](http://www.jeffgeerling.com/), including geerlingguy.drush and geerlingguy.drupal
 
 License
 -------
