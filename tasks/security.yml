@@ -1,0 +1,19 @@
+---
+- name: Update services file permissions
+  file:
+    path: "{{ drupal_site_path }}/web/sites/default/services.yml"
+    mode: 0644
+    
+- name: Update settings file permissions
+  file:
+    path: "{{ drupal_site_path }}/web/sites/default/settings.php"
+    mode: 0644
+
+- name: Update Trusted Host Configuration in settings.php
+  blockinfile:
+    dest: "{{ drupal_site_path }}/web/sites/default/settings.php"
+    block: |
+      $settings['trusted_host_patterns'] = array(
+        '^localhost$',
+        '^{{ ansible_host }}$',
+      );
