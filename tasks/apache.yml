@@ -19,3 +19,6 @@
   command: a2ensite {{ drupal_site_name }}
   notify: apache_restart
   
+- name: a2dissite default site
+  command: a2dissite 000-default.conf
+  notify: apache_restart
