@@ -17,5 +17,5 @@
   
 - name: a2ensite site
   command: a2ensite {{ drupal_apache_conf_file }}
-  when: "{{ drupal_apache_mode }} == vhost"
+  when: drupal_apache_mode == "vhost"
   notify: apache_restart
