@@ -1,24 +1,21 @@
 ---
 - name: check if site apache config already exists
-  stat: path=/etc/apache2/sites-available/{{ drupal_site_name }}.conf
+  stat: path={{ drupal_apache_conf_path }}/{{ drupal_apache_conf_file }}
   register: original
   
 - name: check if site apache config backup already exists
-  stat: path=/etc/apache2/sites-available/{{ drupal_site_name }}.bak
+  stat: path={{ drupal_apache_conf_path }}/{{ drupal_apache_conf_backup }}
   register: backup
   
 - name: Make a backup copy of the site apache config file
-  shell: cp /etc/apache2/sites-available/{{ drupal_site_name }}.conf /etc/apache2/sites-available/{{ drupal_site_name }}.bak
+  shell: cp {{ drupal_apache_conf_path }}/{{ drupal_apache_conf_file }} {{ drupal_apache_conf_path }}/{{ drupal_apache_conf_backup }}
   when: original.stat.exists and not backup.stat.exists
   
 - name: Create an apache config file for site based on template
-  template: src=site.conf dest=/etc/apache2/sites-available/{{ drupal_site_name }}.conf
+  template: src=drupal_apache.conf dest={{ drupal_apache_conf_path }}/{{ drupal_apache_conf_file }}
   notify: apache_restart
   
 - name: a2ensite site
-  command: a2ensite {{ drupal_site_name }}
-  notify: apache_restart
-  
-- name: a2dissite default site
-  command: a2dissite 000-default.conf
+  command: a2ensite {{ drupal_apache_conf_file }}
+  when: "{{ drupal_apache_mode }} == vhost"
   notify: apache_restart
