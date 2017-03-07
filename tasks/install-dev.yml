@@ -1,14 +1,14 @@
 --- 
-- Clone the repository
-  become: no
+- name: Clone the repository
+  become: yes
   git:
     repo: "{{ drupal_git_site_repo }}"
-    dest: "{{ drupal_site_path }} "
+    dest: "{{ drupal_site_path }}"
     update: yes
-  notify: site update permissions
+  notify: drupal_site update permissions
 
-- Install Core Dependencies
-  become: no
+- name: Install Core Dependencies
+  become: yes
   composer:
     command: update
     working_dir: "{{ drupal_site_path }}"
