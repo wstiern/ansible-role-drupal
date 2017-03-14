@@ -2,8 +2,9 @@
 - name: Clone the repository
   become: yes
   git:
-    repo: "{{ item.git_repo }}"
-    dest: "{{ item.site_path }}"
+    repo:    "{{ item.git.repo    }}"
+    version: "{{ item.git.version }}"
+    dest:    "{{ item.site_path   }}"
     update: yes
   with_items: drupal_sites
   no_log: True
@@ -16,3 +17,4 @@
     working_dir: "{{ item.site_path }}"
   with_items: drupal_sites
   no_log: True
+...

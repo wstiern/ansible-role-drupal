@@ -1,5 +1,6 @@
 ---
 - name: drupal_site update permissions
-  file: path='{{ drupal_site_path }}' state=directory owner=www-data group=staff recurse=yes mode=g+rw
-
-  
+  file: path='{{ item.site_path }}' state=directory owner=www-data group=staff recurse=yes mode=g+rw
+  with_items: drupal_sites
+  no_log: True
+...

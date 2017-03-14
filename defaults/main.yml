@@ -2,12 +2,16 @@
 drupal_sites:
   - site_name: drupal
     site_path: /srv/sites/drupal
-    git_repo: https://github.com/drupal-composer/drupal-project
+    git:
+      repo: https://github.com/drupal-composer/drupal-project
+      version: HEAD
     site_db:
-      name: drupal
+      name:     drupal
       username: drupal
       password: "{{ vault_drupal_sites.0.site_db.password }}"
     apache:
       mode: alias # alias|vhost
       uri: /drupal
       conf_file: /etc/apache2/sites-enabled/conf.d/drupal.conf
+      #conf_data: | # Custom Apache Configuration
+...
