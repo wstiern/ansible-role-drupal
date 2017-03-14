@@ -9,10 +9,11 @@
 
 - name: Create mysql user for site
   mysql_user:
-    name: "{{ item.site_db.username }}"
+    name:     "{{ item.site_db.username }}"
     password: "{{ item.site_db.password }}"
-    priv: "{{ item.site_db.name }}.*:ALL"
+    priv:     "{{ item.site_db.name }}.*:ALL"
     state: present
     config_file: "{{ mysql_defaults_extra_file }}"
   with_items: drupal_sites
   no_log: True
+...

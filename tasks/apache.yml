@@ -10,7 +10,7 @@
 - name: Overwrite apache config file for site if template exists
   copy:
     content: "{{ item.apache.conf_data }}"
-    dest: "{{ item.apache.conf_file }}"
+    dest:    "{{ item.apache.conf_file }}"
   when: item.apache.conf_data is defined
   with_items: drupal_sites
   no_log: True
@@ -22,3 +22,4 @@
   with_items: drupal_sites
   no_log: True
   notify: apache_restart
+...
