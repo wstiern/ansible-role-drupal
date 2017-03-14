@@ -2,13 +2,17 @@
 - name: Create mysql database
   mysql_db:
     config_file: "{{ mysql_defaults_extra_file }}"
-    name: "{{ drupal_site_db.name }}"
+    name: "{{ item.site_db.name }}"
     state: present
+  with_items: drupal_sites
+  no_log: True
 
 - name: Create mysql user for site
   mysql_user:
-    name: "{{ drupal_site_db.username }}"
-    password: "{{ drupal_site_db.password }}"
-    priv: "{{ drupal_site_db.name }}.*:ALL"
+    name: "{{ item.site_db.username }}"
+    password: "{{ item.site_db.password }}"
+    priv: "{{ item.site_db.name }}.*:ALL"
     state: present
     config_file: "{{ mysql_defaults_extra_file }}"
+  with_items: drupal_sites
+  no_log: True

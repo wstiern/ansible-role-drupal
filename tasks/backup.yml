@@ -1,0 +1,21 @@
+---
+- name: Install backup configuration
+  template:
+    src: backup.cnf.j2
+    dest: /etc/cron.daily/backup.d/{{ item.site_name }}.cnf
+    owner: root
+    group: root
+    mode: 0400
+  with_items: drupal_sites
+  no_log: True
+
+- name: Install backup script
+  template:
+    src: backup.sh.j2
+    dest: /etc/cron.daily/backup.d/{{ item.site_name }}
+    owner: root
+    group: root
+    mode: 0755
+  with_items: drupal_sites
+  no_log: True
+...

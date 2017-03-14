@@ -1,30 +1,24 @@
 ---
-- name: check if site apache config already exists
-  stat: path={{ drupal_apache_conf_path }}
-  register: original
-  
-- name: check if site apache config backup already exists
-  stat: path={{ drupal_apache_conf_path }}.bak
-  register: backup
-  
-- name: Make a backup copy of the site apache config file
-  shell: cp {{ drupal_apache_conf_path }} {{ drupal_apache_conf_path }}.bak
-  when: original.stat.exists and not backup.stat.exists
-
 - name: Create an apache config file for site
   template:
-    src: drupal_apache.conf
-    dest: "{{ drupal_apache_conf_path }}"
+    src: alias.conf.j2
+    dest: "{{ item.apache.conf_file }}"
+  with_items: drupal_sites
+  no_log: True
   notify: apache_restart
 
 - name: Overwrite apache config file for site if template exists
   copy:
-    content: "{{ drupal_apache_custom_conf_data }}"
-    dest: "{{ drupal_apache_conf_path }}"
-  when: drupal_apache_custom_conf_data is defined
+    content: "{{ item.apache.conf_data }}"
+    dest: "{{ item.apache.conf_file }}"
+  when: item.apache.conf_data is defined
+  with_items: drupal_sites
+  no_log: True
   notify: apache_restart
 
-- name: a2ensite site
-  command: a2ensite {{ drupal_apache_conf_path }}
-  when: drupal_apache_mode == "vhost"
+- name: Activate VHost
+  command: a2ensite {{ item.apache.conf_file }}
+  when: item.apache.mode == "vhost"
+  with_items: drupal_sites
+  no_log: True
   notify: apache_restart

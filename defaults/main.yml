@@ -1,17 +1,13 @@
 ---
-drupal_git_site_repo: https://github.com/drupal-composer/drupal-project
-
-drupal_site_install_dir: /srv/sites
-drupal_site_name: drupal
-drupal_site_path: "{{ drupal_site_install_dir }}/{{ drupal_site_name }}"
-
-drupal_site_db:
-  name: "{{ drupal_site_name }}"
-  username: "{{ drupal_site_name }}"
-  password: "{{ vault_drupal_site_db.pass }}"
-
-drupal_apache_mode: alias
-drupal_apache_uri: /
-drupal_apache_conf_path: /etc/apache2/sites-enabled/conf.d/{{ drupal_site_name }}.conf
-drupal_apache_custom_conf_data: |
-  # APACHE CONFIG HERE
+drupal_sites:
+  - site_name: drupal
+    site_path: /srv/sites/drupal
+    git_repo: https://github.com/drupal-composer/drupal-project
+    site_db:
+      name: drupal
+      username: drupal
+      password: "{{ vault_drupal_sites.0.site_db.password }}"
+    apache:
+      mode: alias # alias|vhost
+      uri: /drupal
+      conf_file: /etc/apache2/sites-enabled/conf.d/drupal.conf

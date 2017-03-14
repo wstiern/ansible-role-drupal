@@ -1,0 +1,8 @@
+Alias {{ item.apache.uri }} "{{ item.site_path }}/web"
+<Directory "{{ item.site_path }}/web">
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+
+    Include {{ item.site_path }}/web/.htaccess
+</Directory>
